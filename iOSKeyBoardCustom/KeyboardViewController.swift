@@ -7,34 +7,70 @@
 //
 
 import UIKit
+import SnapKit
+import SDWebImage
 
 class KeyboardViewController: UIInputViewController {
-
-    @IBOutlet var nextKeyboardButton: UIButton!
+    
+    @IBOutlet weak var nextKeyboard: UIButton!
+    
+    var keyView:UIView!
+    
+    var downloader:SDWebImageDownloader!
 
     override func updateViewConstraints() {
         super.updateViewConstraints()
     
         // Add custom view sizing constraints here
     }
+    
+    func loadInterface() {
+        // load the nib file
+        let viewNib = UINib(nibName: "KeyboardView", bundle: nil)
+        
+        // instantiate the view
+        keyView = viewNib.instantiateWithOwner(self, options: nil)[0] as! UIView
+        
+        keyView.translatesAutoresizingMaskIntoConstraints = false
+
+        // add the interface to the main view
+        view.addSubview(keyView)
+        
+        // copy the background color
+        keyView.snp_makeConstraints { (make) -> Void in
+            make.edges.equalTo(self.view).inset(UIEdgeInsetsMake(0, 0, 0, 0))
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-    
-        // Perform custom UI setup here
-        self.nextKeyboardButton = UIButton(type: .System)
-    
-        self.nextKeyboardButton.setTitle(NSLocalizedString("Next Keyboard", comment: "Title for 'Next Keyboard' button"), forState: .Normal)
-        self.nextKeyboardButton.sizeToFit()
-        self.nextKeyboardButton.translatesAutoresizingMaskIntoConstraints = false
-    
-        self.nextKeyboardButton.addTarget(self, action: "advanceToNextInputMode", forControlEvents: .TouchUpInside)
+        loadInterface()
+        self.nextKeyboard.addTarget(self, action: "advanceToNextInputMode", forControlEvents: .TouchUpInside)
         
-        self.view.addSubview(self.nextKeyboardButton)
-    
-        let nextKeyboardButtonLeftSideConstraint = NSLayoutConstraint(item: self.nextKeyboardButton, attribute: .Left, relatedBy: .Equal, toItem: self.view, attribute: .Left, multiplier: 1.0, constant: 0.0)
-        let nextKeyboardButtonBottomConstraint = NSLayoutConstraint(item: self.nextKeyboardButton, attribute: .Bottom, relatedBy: .Equal, toItem: self.view, attribute: .Bottom, multiplier: 1.0, constant: 0.0)
-        self.view.addConstraints([nextKeyboardButtonLeftSideConstraint, nextKeyboardButtonBottomConstraint])
+        downloader =  SDWebImageDownloader.sharedDownloader()
+        
+        let url = NSURL(string: "https://49.media.tumblr.com/tumblr_md8vg1EiDu1rrx588o1_500.gif")
+        
+        
+        let gifView = UIImageView(image: UIImage(named: "Next"))
+        gifView.frame.size = self.keyView.frame.size
+        self.keyView.addSubview(gifView)
+//        gifView.snp_makeConstraints { (make) -> Void in
+//            make.edges.equalTo(self.keyView).inset(UIEdgeInsetsMake(10, 10, 10, 10))
+//        }
+         gifView.sd_setImageWithURL(url)
+
+        
+        
+//        downloader.downloadImageWithURL(url, options: .AllowInvalidSSLCertificates, progress: { (receivedSize, expectedSize) -> Void in
+//            }) { (image, data, error, finished) -> Void in
+//                if finished == true  {
+//                    
+//                   
+//                }
+//        }
+        
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -56,7 +92,7 @@ class KeyboardViewController: UIInputViewController {
         } else {
             textColor = UIColor.blackColor()
         }
-        self.nextKeyboardButton.setTitleColor(textColor, forState: .Normal)
+        self.nextKeyboard.setTitleColor(textColor, forState: .Normal)
     }
 
 }
